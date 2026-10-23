@@ -1,6 +1,7 @@
 import sys
 import os
 import glob
+from pathlib import Path
 
 # --- KRİTİK WINDOWS AYARLARI (En Başta Olmalı) ---
 # Spark ve Hadoop'un yerini Python'a sert bir şekilde öğretiyoruz.
@@ -29,6 +30,11 @@ from pyspark.sql import SparkSession
 from extract import extract_data
 from transformation import transform_data
 from load import load_data
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from db_env import load_db_config
 
 # --- DRIVER DOSYASI KONTROLÜ ---
 driver_folder = "C:\\termproject_datasci\\drivers"
@@ -71,13 +77,7 @@ def main():
 
     # 4. Load
     print("💾 Veritabanı ayarları yapılıyor...")
-    db_config = {
-        "host": "localhost",
-        "port": "5432",
-        "user": "postgres",
-        "password": "12345",  
-        "dbname": "term_project_db"
-    }
+    db_config = load_db_config()
 
     load_data(final_df, "stock_prices", db_config)
 
